@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO: Primary Meta Tags -->
+    <title>Rabbits Multiply: Math Adventure</title>
+    <meta name="description" content="Play Rabbits Multiply, a fun educational math game where you help a bunny jump through levels by solving multiplication problems. Master math facts in this arcade adventure.">
+    <meta name="keywords" content="rabbits multiply, math game, multiplication game, educational game, math arcade, learning math, kids math game, multiplication practice">
+    <meta name="author" content="Chris Pirillo">
+    <link rel="canonical" href="https://pirillo.com/arcade/rabbits-multiply.html">
+
+    <!-- SEO: Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/rabbits-multiply.html">
+    <meta property="og:title" content="Rabbits Multiply: Math Adventure">
+    <meta property="og:description" content="Jump into learning! Solve multiplication problems to help the rabbit reach new heights in this educational arcade game.">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/rabbits-multiply.png">
+
+    <!-- SEO: Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://pirillo.com/arcade/rabbits-multiply.html">
+    <meta name="twitter:title" content="Rabbits Multiply: Math Adventure">
+    <meta name="twitter:description" content="Master multiplication in this fun, jumping rabbit adventure game.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/rabbits-multiply.png">
+
+    <!-- Performance: Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+
+    <!-- Analytics: Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- SEO: JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Rabbits Multiply",
+      "url": "https://pirillo.com/arcade/rabbits-multiply.html",
+      "description": "An educational math multiplication game where players help a rabbit jump by solving equations.",
+      "genre": "Educational",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://pirillo.com"
+      },
+      "image": "https://pirillo.com/arcade/images/rabbits-multiply.png",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- Load Tailwind CSS (Critical - Keep Blocking/Sync as requested) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load React and ReactDOM (Optimized: Switched to Production Minified & Deferred) -->
+    <script defer crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script defer crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Load Babel (Deferred) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #e0f2fe;
+            font-family: 'Fredoka', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* --- Animations --- */
+
+        @keyframes drift {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100vw); }
+        }
+        .animate-drift-slow { animation: drift 60s linear infinite; }
+        .animate-drift-medium { animation: drift 40s linear infinite; }
+        .animate-drift-fast { animation: drift 25s linear infinite; }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-breathe { animation: breathe 3s ease-in-out infinite; }
+
+        @keyframes jump {
+            0% { transform: translateY(0) scale(1); }
+            40% { transform: translateY(-40px) scale(0.9, 1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .animate-jump { animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Timer Bar */
+        @keyframes shrink {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .animate-timer { animation: shrink linear forwards; }
+
+        /* --- CONFETTI FIX --- */
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg) translateX(50px); opacity: 0; }
+        }
+        .confetti-piece { 
+            position: fixed; 
+            top: 0; 
+            pointer-events: none; 
+            z-index: 9999;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes floatUpFade {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+        .animate-float-text { animation: floatUpFade 1s ease-out forwards; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 3px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Semantic HTML: Changed div to main for accessibility -->
+    <main id="root"></main>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        const Cloud = ({ size, className, opacity = 1 }) => (
+            <svg width={size} height={size * 0.6} viewBox="0 0 24 14" fill="currentColor" className={className} style={{opacity}}>
+                <path d="M17.5 14C19.985 14 22 11.985 22 9.5C22 7.132 20.177 5.244 17.819 5.022C17.368 1.551 14.417 -1 11 -1C7.134 -1 4 2.134 4 6C1.79 6 0 7.79 0 10C0 12.209 1.79 14 4 14H17.5Z"/>
+            </svg>
+        );
+
+        // --- NEW BUNNY DESIGN ---
+        const Bunny = ({ state }) => {
+            const isJumping = state === 'correct';
+            const isSad = state === 'incorrect' || state === 'timeout';
+            
+            // Ear rotations based on state
+            const leftEarRot = isSad ? "-40" : (isJumping ? "-10" : "-5");
+            const rightEarRot = isSad ? "40" : (isJumping ? "10" : "5");
+
+            return (
+                <div className={`relative w-64 h-64 -mb-8 transition-transform duration-300 ${isJumping ? 'animate-jump' : 'animate-breathe'}`}>
+                    <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-xl overflow-visible">
+                        <g transform="translate(100, 120)">
+                            
+                            {/* --- Ears --- */}
+                            {/* Animated transition for ears */}
+                            <g className="transition-all duration-500 ease-in-out">
+                                {/* Left Ear */}
+                                <g transform={`rotate(${leftEarRot} -25 -40)`}>
+                                    <path d="M-25 -40 C-45 -90 -55 -110 -25 -110 C5 -110 -5 -90 -15 -40 Z" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+                                    <path d="M-25 -50 C-35 -80 -40 -95 -25 -95 C-10 -95 -15 -80 -18 -50 Z" fill="#fbcfe8" />
+                                </g>
+                                
+                                {/* Right Ear */}
+                                <g transform={`rotate(${rightEarRot} 25 -40)`}>
+                                    <path d="M25 -40 C45 -90 55 -110 25 -110 C-5 -110 5 -90 15 -40 Z" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+                                    <path d="M25 -50 C35 -80 40 -95 25 -95 C10 -95 15 -80 18 -50 Z" fill="#fbcfe8" />
+                                </g>
+                            </g>
+
+                            {/* --- Body (Main shape) --- */}
+                            <path d="M-40 20 C-50 60 50 60 40 20 C40 -20 30 -50 0 -50 C-30 -50 -40 -20 -40 20 Z" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+
+                            {/* --- Feet --- */}
+                            <g transform="translate(0, 50)">
+                                <ellipse cx="-25" cy="0" rx="15" ry="10" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+                                <ellipse cx="25" cy="0" rx="15" ry="10" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+                                {/* Toe Beans */}
+                                <circle cx="-25" cy="-2" r="3" fill="#fbcfe8" />
+                                <circle cx="25" cy="-2" r="3" fill="#fbcfe8" />
+                            </g>
+
+                            {/* --- Arms --- */}
+                            <ellipse cx="-35" cy="15" rx="10" ry="18" transform="rotate(20 -35 15)" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+                            <ellipse cx="35" cy="15" rx="10" ry="18" transform="rotate(-20 35 15)" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+
+                            {/* --- Face --- */}
+                            <g transform="translate(0, -15)">
+                                {/* Cheeks */}
+                                <circle cx="-25" cy="5" r="8" fill="#fbcfe8" opacity="0.6" />
+                                <circle cx="25" cy="5" r="8" fill="#fbcfe8" opacity="0.6" />
+
+                                {/* Nose */}
+                                <path d="M-4 0 Q0 3 4 0 Q0 6 -4 0" fill="#f472b6" />
+
+                                {/* Mouth */}
+                                {isJumping ? (
+                                    <path d="M-6 8 Q0 18 6 8" fill="#334155" /> 
+                                ) : isSad ? (
+                                    <path d="M-6 10 Q0 5 6 10" fill="none" stroke="#334155" strokeWidth="2" strokeLinecap="round" />
+                                ) : (
+                                    <path d="M-6 5 Q-3 10 0 5 Q3 10 6 5" fill="none" stroke="#334155" strokeWidth="2" strokeLinecap="round" />
+                                )}
+
+                                {/* Eyes */}
+                                {isJumping ? (
+                                    // Happy Eyes ^ ^ (Moved closer: -15 and 15)
+                                    <g stroke="#334155" strokeWidth="3" fill="none" strokeLinecap="round">
+                                        <path d="M-20 -5 Q-15 -15 -10 -5" />
+                                        <path d="M10 -5 Q15 -15 20 -5" />
+                                    </g>
+                                ) : isSad ? (
+                                    // Sad Eyes > < (Moved closer: -15 and 15 center points)
+                                    <g stroke="#334155" strokeWidth="3" fill="none" strokeLinecap="round">
+                                        <path d="M-22 -10 L-8 0" />
+                                        <path d="M-22 0 L-8 -10" />
+                                        <path d="M8 -10 L22 0" />
+                                        <path d="M8 0 L22 -10" />
+                                        {/* Tear */}
+                                        <path d="M-25 5 Q-30 15 -25 20 Q-20 15 -25 5" fill="#60a5fa" stroke="none" />
+                                    </g>
+                                ) : (
+                                    // Normal Eyes (Moved closer: -15 and 15)
+                                    <g>
+                                        <circle cx="-15" cy="-5" r="5" fill="#334155" />
+                                        <circle cx="15" cy="-5" r="5" fill="#334155" />
+                                        <circle cx="-13" cy="-7" r="2" fill="#fff" />
+                                        <circle cx="17" cy="-7" r="2" fill="#fff" />
+                                    </g>
+                                )}
+                            </g>
+
+                            {/* --- Bow Tie (Accessory) --- */}
+                            <g transform="translate(0, 20)">
+                                <path d="M0 0 L-10 -5 L-10 5 Z" fill="#f472b6" />
+                                <path d="M0 0 L10 -5 L10 5 Z" fill="#f472b6" />
+                                <circle cx="0" cy="0" r="3" fill="#ec4899" />
+                            </g>
+
+                        </g>
+                    </svg>
+                </div>
+            );
+        };
+
+        const LEVELS = [
+            { name: 'Sprout',   range: [0, 3],  time: 15, colors: 'from-blue-200 via-sky-100 to-white',  accent: 'text-blue-500' },
+            { name: 'Seedling', range: [1, 5],  time: 12, colors: 'from-teal-200 via-green-100 to-white',  accent: 'text-teal-500' },
+            { name: 'Bud',      range: [2, 9],  time: 10, colors: 'from-green-300 via-lime-100 to-white',accent: 'text-green-600' },
+            { name: 'Bloom',    range: [3, 11], time: 8,  colors: 'from-indigo-300 via-purple-100 to-white',    accent: 'text-indigo-600' },
+            { name: 'Blossom',  range: [4, 12], time: 7,  colors: 'from-purple-400 via-pink-200 to-white', accent: 'text-purple-600' },
+            { name: 'Master',   range: [6, 15], time: 5,  colors: 'from-fuchsia-500 via-rose-300 to-orange-100',  accent: 'text-fuchsia-700' },
+        ];
+
+        function CloudHopper() {
+            // Persistent State
+            const [highScore, setHighScore] = useState(() => {
+                const saved = localStorage.getItem('cloudHopperHighScore');
+                return saved ? parseInt(saved, 10) : 0;
+            });
+
+            // Game State
+            const [levelIndex, setLevelIndex] = useState(0);
+            const [score, setScore] = useState(0);
+            const [streak, setStreak] = useState(0);
+            const [question, setQuestion] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [gameState, setGameState] = useState('menu'); // menu, playing, correct, incorrect, timeout
+            const [floatingText, setFloatingText] = useState(null);
+            const [confetti, setConfetti] = useState([]);
+            
+            // Refs
+            const levelIndexRef = useRef(levelIndex);
+            
+            // Sync Ref
+            useEffect(() => { levelIndexRef.current = levelIndex; }, [levelIndex]);
+
+            // Save High Score
+            useEffect(() => {
+                if (score > highScore) {
+                    setHighScore(score);
+                    localStorage.setItem('cloudHopperHighScore', score.toString());
+                }
+            }, [score, highScore]);
+
+            // --- Timer Logic ---
+            useEffect(() => {
+                let timer;
+                if (gameState === 'playing') {
+                    const duration = LEVELS[levelIndex].time * 1000;
+                    timer = setTimeout(() => {
+                        handleAnswer(null, true);
+                    }, duration);
+                }
+                return () => clearTimeout(timer);
+            }, [gameState, levelIndex, question]); // Re-run when question changes or game starts
+
+            const generateQuestion = useCallback(() => {
+                const currentLevel = LEVELS[levelIndexRef.current];
+                const min = currentLevel.range[0];
+                const max = currentLevel.range[1];
+
+                const factorA = Math.floor(Math.random() * (max - min + 1)) + min;
+                const factorB = Math.floor(Math.random() * (max - min + 1)) + min;
+                const correctAnswer = factorA * factorB;
+
+                const distractors = new Set();
+                while (distractors.size < 2) {
+                    let d;
+                    const strategy = Math.random();
+                    if (strategy < 0.33) {
+                        d = correctAnswer + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
+                    } else if (strategy < 0.66) {
+                        d = factorA * (factorB + (Math.random() < 0.5 ? 1 : -1));
+                    } else {
+                        d = Math.floor(Math.random() * 50);
+                    }
+                    if (d >= 0 && d !== correctAnswer) distractors.add(d);
+                }
+
+                const allOptions = [...distractors, correctAnswer].sort(() => Math.random() - 0.5);
+
+                setQuestion({ factorA, factorB, correctAnswer });
+                setOptions(allOptions);
+                setGameState('playing');
+                setFloatingText(null);
+            }, []);
+
+            const startGame = () => {
+                setScore(0);
+                setStreak(0);
+                setLevelIndex(0);
+                generateQuestion();
+            };
+
+            const triggerConfetti = () => {
+                const colors = ['#f472b6', '#4ade80', '#60a5fa', '#fbbf24', '#a78bfa'];
+                const newConfetti = Array.from({ length: 50 }).map((_, i) => ({
+                    id: Date.now() + i,
+                    left: Math.random() * 100, 
+                    bg: colors[Math.floor(Math.random() * colors.length)],
+                    duration: (Math.random() * 2 + 3) + 's',
+                    size: (Math.random() * 0.5 + 0.4) + 'rem',
+                    delay: (Math.random() * 0.5) + 's', 
+                    rotation: Math.random() * 360 + 'deg'
+                }));
+                setConfetti(newConfetti);
+                setTimeout(() => setConfetti([]), 5000);
+            };
+
+            const handleAnswer = (selected, isTimeout = false) => {
+                if (gameState !== 'playing') return;
+                
+                if (!isTimeout && selected === question.correctAnswer) {
+                    // Correct
+                    const points = 100 + (streak * 10) + (levelIndexRef.current * 50);
+                    setGameState('correct');
+                    setScore(s => s + points);
+                    setStreak(s => s + 1);
+                    setFloatingText(`+${points}`);
+                    triggerConfetti();
+
+                    if ((streak + 1) % 5 === 0 && levelIndexRef.current < LEVELS.length - 1) {
+                        setTimeout(() => setLevelIndex(prev => prev + 1), 1000);
+                    }
+
+                    setTimeout(generateQuestion, 1500);
+                } else {
+                    // Incorrect or Timeout
+                    setGameState(isTimeout ? 'timeout' : 'incorrect');
+                    setStreak(0);
+                    
+                    const penalty = 50;
+                    setScore(s => Math.max(0, s - penalty));
+                    setFloatingText(isTimeout ? "Time's Up!" : "Oops!");
+
+                    setTimeout(generateQuestion, 2000);
+                }
+            };
+
+            const currentLvl = LEVELS[levelIndex];
+
+            // --- Render ---
+            return (
+                <div className={`h-screen w-screen relative overflow-hidden bg-gradient-to-br ${currentLvl.colors} transition-colors duration-1000 flex flex-col items-center justify-center`}>
+                    
+                    {/* --- Background --- */}
+                    <div className="absolute inset-0 pointer-events-none opacity-40">
+                        <div className="absolute top-[10%] -left-[200px] animate-drift-slow text-white"><Cloud size={300} /></div>
+                        <div className="absolute top-[60%] left-[10%] animate-drift-medium text-white opacity-60"><Cloud size={250} /></div>
+                        <div className="absolute bottom-[10%] -left-[100px] animate-drift-fast text-white opacity-80"><Cloud size={150} /></div>
+                    </div>
+
+                    {/* --- Confetti --- */}
+                    {confetti.map(c => (
+                        <div key={c.id} className="confetti-piece rounded-sm"
+                            style={{ 
+                                left: `${c.left}vw`, 
+                                backgroundColor: c.bg, 
+                                width: c.size, 
+                                height: c.size, 
+                                animationDuration: c.duration,
+                                animationDelay: c.delay,
+                                transform: `translateY(0) rotate(${c.rotation})` 
+                            }} 
+                        />
+                    ))}
+
+                    {/* --- Menu Overlay --- */}
+                    {(gameState === 'menu') && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-fade-in">
+                            <div className="glass-panel p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center transform hover:scale-105 transition-transform duration-300">
+                                <h1 className="text-4xl font-black text-slate-700 mb-2">Rabbits Multiply</h1>
+                                <p className="text-slate-500 font-bold mb-6">Ready to jump?</p>
+                                
+                                {highScore > 0 && (
+                                    <div className="mb-6 bg-yellow-100 text-yellow-700 py-2 rounded-xl font-bold border border-yellow-200">
+                                        🏆 Best: {highScore}
+                                    </div>
+                                )}
+
+                                <button 
+                                    onClick={startGame}
+                                    className="w-full py-4 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-xl font-black text-xl shadow-lg hover:shadow-sky-300/50 hover:-translate-y-1 transition-all active:scale-95"
+                                >
+                                    START GAME
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- HUD --- */}
+                    <div className="absolute top-0 left-0 w-full p-4 md:p-6 flex justify-between items-start z-40">
+                        <div className="glass-panel px-4 py-2 rounded-2xl shadow-md">
+                            <span className="text-xs font-bold text-slate-400 uppercase mr-2">Level</span>
+                            <span className={`text-xl font-black ${currentLvl.accent}`}>{currentLvl.name}</span>
+                        </div>
+                        <div className="glass-panel px-6 py-2 rounded-2xl shadow-md text-right min-w-[120px]">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">Score</span>
+                            <span className="text-3xl font-black text-slate-700">{score}</span>
+                            {streak > 1 && <div className="text-orange-500 text-xs font-bold animate-pulse">🔥 {streak}x Streak</div>}
+                        </div>
+                    </div>
+
+                    {/* --- Main Game Stage --- */}
+                    {gameState !== 'menu' && (
+                        <div className="relative z-10 w-full flex flex-col items-center justify-center min-h-[60vh]">
+                            
+                            {/* Character & Cloud Platform */}
+                            <div className="flex flex-col items-center mb-6 relative">
+                                {floatingText && (
+                                    <div className={`absolute -top-32 text-6xl font-black ${gameState === 'correct' ? 'text-green-500' : 'text-red-400'} animate-float-text drop-shadow-md whitespace-nowrap z-50`}>
+                                        {floatingText}
+                                    </div>
+                                )}
+                                {/* The Bunny */}
+                                <Bunny state={gameState} />
+                                
+                                {/* Cloud Platform Removed Here */}
+                            </div>
+
+                            {/* Game Container (Shared width for Question & Answers) */}
+                            <div className="w-full max-w-lg px-4 flex flex-col items-center mt-4">
+                                
+                                {/* Question Box */}
+                                <div className="w-full mb-8 relative">
+                                    {/* Timer Bar */}
+                                    {gameState === 'playing' && (
+                                        <div className="absolute -top-4 left-0 w-full h-2 bg-white/40 rounded-full overflow-hidden">
+                                            <div 
+                                                // Reset animation on new question by using key
+                                                key={`${question.factorA}-${question.factorB}-${levelIndex}`}
+                                                className="h-full bg-sky-400 rounded-full animate-timer" 
+                                                style={{ animationDuration: `${currentLvl.time}s` }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {question && (
+                                        <div className="flex items-center justify-center gap-2 md:gap-4 text-5xl md:text-7xl font-black text-slate-700 drop-shadow-sm glass-panel p-6 rounded-3xl w-full text-center">
+                                            <span>{question.factorA}</span>
+                                            <span className="text-slate-400 text-4xl">×</span>
+                                            <span>{question.factorB}</span>
+                                            <span className="text-slate-400 text-4xl">=</span>
+                                            <span className="text-sky-600">?</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Options Grid */}
+                                <div className="grid grid-cols-3 gap-4 w-full">
+                                    {options.map((opt, idx) => {
+                                        let btnStyle = "bg-white text-slate-600 hover:bg-sky-50 hover:text-sky-600 hover:-translate-y-1 hover:shadow-xl border-b-4 border-slate-200 active:border-b-0 active:translate-y-1 active:mt-1";
+                                        
+                                        if (gameState !== 'playing') {
+                                            if (opt === question.correctAnswer) {
+                                                btnStyle = "bg-green-500 text-white border-green-700 scale-105 shadow-2xl z-20";
+                                            } else {
+                                                btnStyle = "bg-slate-100 text-slate-300 border-slate-200 scale-95 opacity-50";
+                                            }
+                                        }
+
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(opt)}
+                                                disabled={gameState !== 'playing'}
+                                                className={`
+                                                    h-20 md:h-24 rounded-2xl text-3xl md:text-4xl font-black transition-all duration-200 shadow-sm
+                                                    ${btnStyle}
+                                                `}
+                                            >
+                                                {opt}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CloudHopper />);
+    </script>
+</body>
+</html>
